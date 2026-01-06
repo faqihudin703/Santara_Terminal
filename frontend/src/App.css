@@ -1,0 +1,304 @@
+/* =========================================
+   SANTARA TERMINAL (LEGACY LAYOUT)
+   ========================================= */
+
+:root {
+  /* --- COLOR PALETTE (Santara Brand) --- */
+  --bg-app: #0d1117;       /* GitHub Dark (Sama seperti lama) */
+  --card-bg: #161b22;      /* Panel Grey */
+  --border: #30363d;       /* Border Subtle */
+  --bg-input: #010409;     /* Input Black */
+
+  --lisk-color: #00E08F;   /* Primary (Ganti dari Hijau Neon lama) */
+  --base-color: #0052FF;   /* Secondary (Blue) */
+  --sepolia-color: #8899aa;
+  
+  --secondary: #f39c12;    /* Orange (Admin/Warning) */
+  --danger: #ff3333;       /* Red */
+  
+  --text-main: #c9d1d9;    /* Putih Tulang */
+  --text-muted: #8b949e;   /* Abu-abu */
+  
+  /* --- SPACING & TYPOGRAPHY --- */
+  --radius: 8px;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+/* --- GLOBAL RESET --- */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+* { box-sizing: border-box; }
+a { text-decoration: none; color: inherit; }
+
+#root {
+
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  padding-top: 40px;
+
+  padding-bottom: 60px;
+
+}
+
+/* =========================================
+   LAYOUT UTAMA (CENTERING FIX)
+   ========================================= */
+
+/* Container Utama: Memaksa konten ke tengah */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* KUNCI: Center secara horizontal */
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
+
+/* Pembatas Lebar: Agar tidak mepet pinggir layar */
+.app-header, 
+.nav-container, 
+main {
+  width: 100%;
+  max-width: 950px; /* Lebar area kerja "Lega" */
+  padding: 0 10px;  /* Safety padding untuk mobile */
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--lisk-color); /* Branding Lisk */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.wallet-info {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--lisk-color);
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-connect {
+  background: transparent;
+  border: 1px solid var(--lisk-color);
+  color: var(--lisk-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+}
+
+/* =========================================
+   NAVIGASI (TAB STYLE LAMA)
+   ========================================= */
+.nav-container {
+  padding: 0;
+  margin-bottom: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+nav { display: flex; background-color: var(--card-bg); }
+
+.nav-item {
+  flex: 1;
+  text-align: center;
+  padding: 15px 20px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-right: 1px solid var(--border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-item:last-child { border-right: none; }
+
+.nav-item:hover { background-color: #21262d; color: var(--text-main); }
+
+.nav-item.active {
+  background-color: var(--lisk-color);
+  color: #000; /* Teks Hitam agar kontras */
+  font-weight: bold;
+}
+
+/* =========================================
+   GRID SYSTEM (BRIDGE & DEX)
+   ========================================= */
+/* Ini yang membuat tampilan Beli/Jual berdampingan */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 Kolom Rata */
+  gap: 30px; /* Jarak antar kartu (Lega) */
+  width: 100%;
+}
+
+.bridge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* =========================================
+   CARDS (TERMINAL STYLE)
+   ========================================= */
+.terminal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 25px; /* Padding dalam lebih besar */
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.terminal-card.dimmed { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+
+.card-header h3 {
+  margin-top: 0;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+/* CHAIN THEMES */
+.border-lisk { border-color: var(--lisk-color); box-shadow: 0 0 10px rgba(0, 224, 143, 0.05); }
+.text-lisk { color: var(--lisk-color); }
+.bg-lisk { background: var(--lisk-color); color: #000; }
+
+.border-base { border-color: var(--base-color); box-shadow: 0 0 10px rgba(0, 82, 255, 0.05); }
+.text-base { color: var(--base-color); }
+.bg-base { background: var(--base-color); color: #fff; }
+
+/* =========================================
+   INPUTS & BUTTONS
+   ========================================= */
+.input-group { margin-bottom: 20px; }
+
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Input Besar & Jelas */
+.terminal-input, .terminal-select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 12px 15px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  border-radius: 4px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.terminal-input:focus { border-color: var(--lisk-color); }
+
+button.btn-action {
+  width: 100%;
+  padding: 15px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+  margin-top: 10px;
+}
+button:hover { opacity: 0.9; }
+button:disabled { background: #21262d !important; color: #484f58 !important; cursor: not-allowed; }
+
+/* =========================================
+   DEX SPECIFIC (TABS & POOL)
+   ========================================= */
+.pool-info-card {
+  border: 1px solid var(--lisk-color);
+  background: rgba(0, 224, 143, 0.05); /* Green Tint */
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+  color: var(--lisk-color);
+  text-align: center;
+}
+
+.dex-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.dex-tab-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 10px 30px;
+  border-radius: 20px; /* Pill Shape */
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.dex-tab-btn.active {
+  background: var(--card-bg);
+  border-color: var(--lisk-color);
+  color: var(--lisk-color);
+}
+
+/* =========================================
+   UTILITIES
+   ========================================= */
+.status-log {
+  background: #000;
+  border-left: 4px solid var(--lisk-color);
+  color: var(--text-muted);
+  padding: 15px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+.status-log.error { border-color: var(--danger); color: var(--danger); }
+
+.mt-20 { margin-top: 20px; }
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+  .grid-2-col, .bridge-grid { grid-template-columns: 1fr; } /* Stack Vertikal di HP */
+  .app-header { flex-direction: column; gap: 15px; text-align: center; }
+  .nav-item { padding: 10px; font-size: 0.8rem; }
+}
