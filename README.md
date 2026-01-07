@@ -226,9 +226,9 @@ Edit the `.env` file and fill in your details (Using Keystore for security):
 ```env
 KEYSTORE_PATH="./keystore/deployer_keystore.json"
 KEYSTORE_PASSWORD="your_keystore_password"
-SEPOLIA_RPC_URL="[https://sepolia.infura.io/v3/YOUR_KEY](https://sepolia.infura.io/v3/YOUR_KEY)"
-BASE_RPC_URL="[https://base-sepolia.infura.io/v3/YOUR_KEY](https://base-sepolia.infura.io/v3/YOUR_KEY)"
-LISK_SEPOLIA_RPC_URL="[https://rpc.sepolia-api.lisk.com](https://rpc.sepolia-api.lisk.com)"
+SEPOLIA_RPC_URL="https://sepolia.infura.io/v3/YOUR_KEY"
+BASE_RPC_URL="https://base-sepolia.infura.io/v3/YOUR_KEY"
+LISK_SEPOLIA_RPC_URL="https://rpc.sepolia-api.lisk.com"
 ETHERSCAN_API_KEY="your_etherscan_api_key"
 RELAYER_ADDRESS="0x_your_relayer_public_address"
 
@@ -326,16 +326,16 @@ BLOCK_STEP=1
 # 🌐 RPC CONFIGURATION
 # ==========================================
 LISK_CHAIN_ID=4202
-LISK_READ_RPC=[https://lisk-sepolia.drpc.org](https://lisk-sepolia.drpc.org)
-LISK_WRITE_RPC=[https://lisk-sepolia.drpc.org](https://lisk-sepolia.drpc.org)
+LISK_READ_RPC=https://lisk-sepolia.drpc.org
+LISK_WRITE_RPC=https://lisk-sepolia.drpc.org
 
 BASE_CHAIN_ID=84532
-BASE_READ_RPC=[https://base-sepolia-rpc.publicnode.com](https://base-sepolia-rpc.publicnode.com)
-BASE_WRITE_RPC=[https://base-sepolia.infura.io/v3/YOUR_KEY](https://base-sepolia.infura.io/v3/YOUR_KEY)
+BASE_READ_RPC=https://base-sepolia-rpc.publicnode.com
+BASE_WRITE_RPC=https://base-sepolia.infura.io/v3/YOUR_KEY
 
 SEPOLIA_CHAIN_ID=11155111
-SEPOLIA_READ_RPC=[https://ethereum-sepolia-rpc.publicnode.com](https://ethereum-sepolia-rpc.publicnode.com)
-SEPOLIA_WRITE_RPC=[https://sepolia.infura.io/v3/YOUR_KEY](https://sepolia.infura.io/v3/YOUR_KEY)
+SEPOLIA_READ_RPC=https://ethereum-sepolia-rpc.publicnode.com
+SEPOLIA_WRITE_RPC=https://sepolia.infura.io/v3/YOUR_KEY
 
 # ==========================================
 # 🏠 CONTRACT ADDRESSES (Fill from Step 1)
@@ -381,7 +381,7 @@ If you want to run without Docker for debugging:
 1. **Update .env:** Change the keystore path to look in the local directory:
 
 ```env
-KEYSTORE_PATH=./keystore/relayer_key.json
+KEYSTORE_PATH=./keystore/relayer_keystore.json
 ```
 
 2. **Start Service:**
@@ -405,8 +405,8 @@ docker logs -f relayer-v1
 ```text
 🐳 DOCKER ENV DIAGNOSTICS:
 -------------------------------------
-✅ LISK_READ: [https://lisk-sepolia.drpc](https://lisk-sepolia.drpc)...
-✅ BASE_WRITE: [https://base-sepolia.infu](https://base-sepolia.infu)...
+✅ LISK_READ: https://lisk-sepolia.drpc...
+✅ BASE_WRITE: https://base-sepolia.infu...
 -------------------------------------
 🚀 Starting Production Relayer...
 🔐 Decrypting Wallet...
@@ -434,7 +434,7 @@ Edit `.env` with the contract addresses deployed in Step 1.
 
 ```env
 VITE_LISK_CHAIN_ID=4202
-VITE_LISK_RPC_URL=[https://rpc.sepolia-api.lisk.com](https://rpc.sepolia-api.lisk.com)
+VITE_LISK_RPC_URL=https://rpc.sepolia-api.lisk.com
 # ... (Add Base & Sepolia RPCs)
 
 # Contracts
@@ -482,5 +482,6 @@ The app will be available at `http://localhost:5173` (default Vite preview port)
 * **Hackathon:** Lisk Builder Hackathon 2026
 * **Category:** Infrastructure & DeFi
 * **Developer:** Faqihudin
+
 
 **License:** MIT
