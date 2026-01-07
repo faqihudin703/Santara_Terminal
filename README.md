@@ -460,7 +460,7 @@ npm run preview
 
 ```
 
-The app will be available at `http://localhost:4173` (default Vite preview port) or the configured port on your server.
+The app will be available at `http://localhost:5173` (default Vite preview port) or the configured port on your server.
 
 #### 3.3 Feature Check
 
