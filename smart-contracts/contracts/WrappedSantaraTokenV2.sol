@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-/// @custom:oz-upgrades-unsafe-allow missing-initializer-call
 contract WrappedSantaraToken is Initializable, ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeable {
     bytes32 public constant RELAYER_ROLE = keccak256("RELAYER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -34,8 +33,22 @@ contract WrappedSantaraToken is Initializable, ERC20Upgradeable, AccessControlUp
         _disableInitializers();
     }
     
-    /// @custom:oz-upgrades-validate-as-initializer
-    function initializeV3() external reinitializer(3) {
+    function initialize(
+        string memory name_, 
+        string memory symbol_,
+        address admin,
+        uint256 _initialFee
+    ) public initializer {
+        __ERC20_init(name_, symbol_);
+        __AccessControl_init();
+        __Pausable_init();
+
+        // Setup Admin ke Deployer
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(PAUSER_ROLE, msg.sender);
+         _grantRole(RELAYER_ROLE, admin);
+
+        bridgeFee = _initialFee;
         nonce = 1;
     }
 
@@ -98,5 +111,5 @@ contract WrappedSantaraToken is Initializable, ERC20Upgradeable, AccessControlUp
     function unpause() external onlyRole(PAUSER_ROLE) { 
         _unpause(); 
     }
-    uint256[48] private __gap;
+    uint256[50] private __gap;
 }

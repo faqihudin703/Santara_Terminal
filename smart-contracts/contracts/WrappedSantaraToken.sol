@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract WrappedSantaraTokenold is Initializable, ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeable {
+contract WrappedSantaraTokenV1 is Initializable, ERC20Upgradeable, AccessControlUpgradeable, PausableUpgradeable {
     
     bytes32 public constant RELAYER_ROLE = keccak256("RELAYER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");

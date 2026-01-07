@@ -5,7 +5,6 @@ const { ethers, upgrades } = hre;
 const RELAYER_ADDRESS = process.env.RELAYER_ADDRESS;
 
 async function main() {
-  // Kita tidak butuh MRT_ADDRESS lagi di sini karena logika wrapped baru lebih bersih
   if (!RELAYER_ADDRESS) throw new Error("❌ RELAYER_ADDRESS belum di-set di .env");
 
   const [deployer] = await ethers.getSigners();
@@ -18,15 +17,17 @@ async function main() {
   // --------------------------------------------------------
   console.log("\n[1/4] Deploying WrappedSantaraToken (Transparent Proxy)...");
 
-  // Pastikan nama file/contract di Solidity adalah "WrappedSantaraToken"
+  const initialfee = ethers.parseEther("0.0001");
+  
   const WrappedSantaraToken = await ethers.getContractFactory("WrappedSantaraToken");
   
   const wSan = await upgrades.deployProxy(
     WrappedSantaraToken,
     [
-        "Wrapped Lisk Santara Token", // Nama Token Panjang
+        "Wrapped Lisk Santara Token", // Nama Token
         "wSAN",                       // Simbol
-        deployer.address              // Admin awal
+        deployer.address,              // Admin awal
+        initialfee
     ],
     { initializer: "initialize" }
   );
@@ -60,7 +61,7 @@ async function main() {
 
   const PAUSER_ROLE = await wSan.PAUSER_ROLE();
 
-  // Admin (Deployer) biasanya otomatis dapet di initialize, tapi kita pastikan relayer juga dapet
+  // Admin (Deployer) biasanya otomatis dapet di initialize, tapi kita pastikan relayer juga dapat
   const tx2 = await wSan.grantRole(PAUSER_ROLE, RELAYER_ADDRESS);
   await tx2.wait();
 

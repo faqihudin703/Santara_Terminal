@@ -39,11 +39,12 @@ async function main() {
 
   const TokenVault = await ethers.getContractFactory("LiskSantaraVault");
   
-  // Perbaikan: initialize hanya butuh [tokenAddress]. 
+  const initialFee = ethers.parseEther("0.0005");
+  
   // Admin otomatis diset ke deployer di dalam kontrak.
   const tokenVault = await upgrades.deployProxy(
     TokenVault,
-    [sanAddr], 
+    [sanAddr, initialFee], 
     { initializer: "initialize" }
   );
   await tokenVault.waitForDeployment();

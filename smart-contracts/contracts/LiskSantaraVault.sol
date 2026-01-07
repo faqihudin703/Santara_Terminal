@@ -6,30 +6,29 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-/// @custom:oz-upgrades-unsafe-allow missing-initializer-call
-contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessControlUpgradeable, PausableUpgradeable {
+contract LiskSantaraVaultV1 is Initializable, ReentrancyGuardUpgradeable, AccessControlUpgradeable, PausableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
-    IERC20Upgradeable public token;
-    
+
+    // --- STATE VARIABLES ---
+    IERC20Upgradeable public token; // Token SAN
+
+    // Roles
     bytes32 public constant RELAYER_ROLE = keccak256("RELAYER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     
-    mapping(bytes32 => bool) public processedRelease; // Slot 1
+    mapping(bytes32 => bool) public processedRelease;
     
-    uint64 public nonce;
-    
-    uint256 public bridgeFee;
-    
+    uint64 public nonce; 
+
+    // --- EVENTS ---
     event TokensLocked(
         address indexed user,
         address indexed toChainRecipient,
         uint256 amount,
         uint64 nonce,
         uint256 destinationChainId,
-        bytes32 transferID,
-        uint256 timestamp
+        bytes32 transferID
     );
 
     event TokensReleased(
@@ -39,29 +38,38 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
     );
 
     event EmergencyWithdraw(address indexed token, address indexed to, uint256 amount);
-    
-    event FeeUpdated(uint256 newFee);
-    event FeesWithdrawn(address to, uint256 amount);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
-    
-    /// @custom:oz-upgrades-validate-as-initializer
-    function initializeV3() external reinitializer(3) {
-        // Kosong tidak masalah, hanya untuk menandai upgrade version
+
+    // --- INITIALIZER ---
+    function initialize(IERC20Upgradeable _token) external initializer {
+        __ReentrancyGuard_init();
+        __AccessControl_init();
+        __Pausable_init();
+
+        require(address(_token) != address(0), "Zero token address");
+        token = _token;
+
+        // Setup Roles (Deployer jadi Admin & Relayer awal)
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(RELAYER_ROLE, msg.sender);
+        _grantRole(PAUSER_ROLE, msg.sender);
+
+        nonce = 1;
     }
+
+    // --- MAIN FEATURES ---
     
     function lockTokens(
         address toChainRecipient,
         uint256 amount,
         uint256 destinationChainId
-    ) external payable nonReentrant whenNotPaused {
+    ) external nonReentrant whenNotPaused {
         require(amount > 0, "Amount must be > 0");
         require(toChainRecipient != address(0), "Invalid recipient");
-        
-        require(msg.value >= bridgeFee, "Insufficient Bridge Fee");
         
         token.safeTransferFrom(msg.sender, address(this), amount);
         
@@ -72,8 +80,7 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
                 amount,
                 nonce,
                 block.chainid,
-                destinationChainId,
-                block.timestamp
+                destinationChainId
             )
         );
         
@@ -83,8 +90,7 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
             amount,
             nonce,
             destinationChainId,
-            transferID,
-            block.timestamp
+            transferID
         );
 
         unchecked {
@@ -100,26 +106,19 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
         require(to != address(0), "Invalid address");
         require(amount > 0, "Amount > 0");
         
+        // V2 SECURITY: Cek apakah ID ini sudah pernah diproses?
         require(!processedRelease[transferID], "Transfer ID already processed");
 
+        // Tandai sebagai sudah diproses
         processedRelease[transferID] = true;
 
+        // Transfer token dari Vault ke User
         token.safeTransfer(to, amount);
 
         emit TokensReleased(to, amount, transferID);
     }
-    
-    function setBridgeFee(uint256 _newFee) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        bridgeFee = _newFee;
-        emit FeeUpdated(_newFee);
-    }
-    
-    function withdrawFees(address _to) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        uint256 balance = address(this).balance;
-        require(balance > 0, "No fees to withdraw");
-        payable(_to).transfer(balance);
-        emit FeesWithdrawn(_to, balance);
-    }
+
+    // --- ADMIN FUNCTIONS ---
 
     function pause() external onlyRole(PAUSER_ROLE) {
         _pause();
@@ -136,6 +135,4 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
         _token.safeTransfer(_to, _amount);
         emit EmergencyWithdraw(address(_token), _to, _amount);
     }
-    
-    uint256[46] private __gap;
 }

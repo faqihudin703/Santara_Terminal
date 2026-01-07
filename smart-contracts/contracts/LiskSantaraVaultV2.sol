@@ -6,29 +6,30 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessControlUpgradeable, PausableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
-
-    // --- STATE VARIABLES ---
-    IERC20Upgradeable public token; // Token SAN
-
-    // Roles
+    
+    IERC20Upgradeable public token;
+    
     bytes32 public constant RELAYER_ROLE = keccak256("RELAYER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     
     mapping(bytes32 => bool) public processedRelease;
     
-    uint64 public nonce; 
-
-    // --- EVENTS ---
+    uint64 public nonce;
+    
+    uint256 public bridgeFee;
+    
     event TokensLocked(
         address indexed user,
         address indexed toChainRecipient,
         uint256 amount,
         uint64 nonce,
         uint256 destinationChainId,
-        bytes32 transferID
+        bytes32 transferID,
+        uint256 timestamp
     );
 
     event TokensReleased(
@@ -38,13 +39,15 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
     );
 
     event EmergencyWithdraw(address indexed token, address indexed to, uint256 amount);
+    
+    event FeeUpdated(uint256 newFee);
+    event FeesWithdrawn(address to, uint256 amount);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
-
-    // --- INITIALIZER ---
+    
     function initialize(IERC20Upgradeable _token) external initializer {
         __ReentrancyGuard_init();
         __AccessControl_init();
@@ -59,17 +62,18 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
         _grantRole(PAUSER_ROLE, msg.sender);
 
         nonce = 1;
+        bridgeFee = _fee;
     }
-
-    // --- MAIN FEATURES ---
     
     function lockTokens(
         address toChainRecipient,
         uint256 amount,
         uint256 destinationChainId
-    ) external nonReentrant whenNotPaused {
+    ) external payable nonReentrant whenNotPaused {
         require(amount > 0, "Amount must be > 0");
         require(toChainRecipient != address(0), "Invalid recipient");
+        
+        require(msg.value >= bridgeFee, "Insufficient Bridge Fee");
         
         token.safeTransferFrom(msg.sender, address(this), amount);
         
@@ -80,7 +84,8 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
                 amount,
                 nonce,
                 block.chainid,
-                destinationChainId
+                destinationChainId,
+                block.timestamp
             )
         );
         
@@ -90,7 +95,8 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
             amount,
             nonce,
             destinationChainId,
-            transferID
+            transferID,
+            block.timestamp
         );
 
         unchecked {
@@ -106,19 +112,26 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
         require(to != address(0), "Invalid address");
         require(amount > 0, "Amount > 0");
         
-        // V2 SECURITY: Cek apakah ID ini sudah pernah diproses?
         require(!processedRelease[transferID], "Transfer ID already processed");
 
-        // Tandai sebagai sudah diproses
         processedRelease[transferID] = true;
 
-        // Transfer token dari Vault ke User
         token.safeTransfer(to, amount);
 
         emit TokensReleased(to, amount, transferID);
     }
-
-    // --- ADMIN FUNCTIONS ---
+    
+    function setBridgeFee(uint256 _newFee) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        bridgeFee = _newFee;
+        emit FeeUpdated(_newFee);
+    }
+    
+    function withdrawFees(address _to) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No fees to withdraw");
+        payable(_to).transfer(balance);
+        emit FeesWithdrawn(_to, balance);
+    }
 
     function pause() external onlyRole(PAUSER_ROLE) {
         _pause();
@@ -135,4 +148,6 @@ contract LiskSantaraVault is Initializable, ReentrancyGuardUpgradeable, AccessCo
         _token.safeTransfer(_to, _amount);
         emit EmergencyWithdraw(address(_token), _to, _amount);
     }
+    
+    uint256[50] private __gap;
 }
