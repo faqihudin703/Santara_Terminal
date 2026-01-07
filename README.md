@@ -1,4 +1,4 @@
-# ⚡ Santara Terminal: Multi-Chain Liquididty Layer
+# ⚡ Santara Terminal: Multi-Chain Liquidity Layer
 
 **The Unified Liquidity Gateway connecting Lisk Sepolia, Base Sepolia, and Ethereum Sepolia.**
 
@@ -479,9 +479,9 @@ The app will be available at `http://localhost:5173` (default Vite preview port)
 
 ## 🤝 Submission Details
 
-* **Hackathon:** Lisk Builder Hackathon 2026
+* **Hackathon:** Lisk Builder Challenge 2026
 * **Category:** Infrastructure & DeFi
-* **Developer:** Faqihudin
+* **Developer:** Harits Faqihudin
 
 
 **License:** MIT
